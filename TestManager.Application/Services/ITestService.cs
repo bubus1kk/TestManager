@@ -13,4 +13,6 @@ public interface ITestService
     Task<TestDetailsDto?> UpdateAsync(int id, UpdateTestRequest request, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+    Task<TestAttemptResultDto?> SubmitAsync(int id, SubmitTestAttemptRequest request, CancellationToken cancellationToken = default);
 }
