@@ -6,8 +6,8 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #1f2937;
-  background: #f8fafc;
+  color: #172033;
+  background: #f6f7f9;
 }
 
 body {
@@ -16,14 +16,123 @@ body {
   min-height: 100vh;
 }
 
-.app {
+.app-shell {
   min-height: 100vh;
   display: grid;
-  place-items: center;
+  grid-template-columns: 220px minmax(0, 1fr);
 }
 
-h1 {
+.sidebar {
+  border-right: 1px solid #d9dee7;
+  background: #ffffff;
+  padding: 24px 16px;
+}
+
+.brand {
+  color: #101827;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-link {
+  border-radius: 8px;
+  color: #4b5565;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #edf2f7;
+  color: #101827;
+}
+
+.content {
+  min-width: 0;
+  padding: 32px;
+}
+
+.page {
+  max-width: 1080px;
+}
+
+.page-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 600;
+}
+
+.page-header p {
+  color: #647084;
+  margin: 6px 0 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  align-items: center;
+  border: 1px solid #cbd3df;
+  border-radius: 8px;
+  color: #172033;
+  display: inline-flex;
+  font-weight: 600;
+  min-height: 38px;
+  padding: 0 14px;
+  text-decoration: none;
+}
+
+.button.primary {
+  background: #1f6feb;
+  border-color: #1f6feb;
+  color: #ffffff;
+}
+
+.placeholder {
+  border: 1px dashed #b8c2d1;
+  border-radius: 8px;
+  color: #647084;
+  padding: 24px;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-bottom: 1px solid #d9dee7;
+    border-right: 0;
+    padding: 16px;
+  }
+
+  .nav {
+    flex-direction: row;
+  }
+
+  .content {
+    padding: 24px 16px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
