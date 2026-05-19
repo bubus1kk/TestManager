@@ -4,6 +4,7 @@ export enum QuestionType {
 }
 
 export interface TestListItemDto {
+  description?: string;
   id: number;
   title: string;
   questionsCount: number;
@@ -23,6 +24,7 @@ export interface QuestionDto {
 }
 
 export interface TestDetailsDto {
+  description?: string;
   id: number;
   title: string;
   questions: QuestionDto[];
@@ -40,6 +42,7 @@ export interface CreateQuestionRequest {
 }
 
 export interface CreateTestRequest {
+  description?: string;
   title: string;
   questions: CreateQuestionRequest[];
 }
