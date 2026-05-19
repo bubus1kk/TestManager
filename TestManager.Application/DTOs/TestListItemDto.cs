@@ -6,5 +6,7 @@ public class TestListItemDto
 
     public required string Title { get; set; }
 
+    public string? Description { get; set; }
+
     public int QuestionsCount { get; set; }
 }

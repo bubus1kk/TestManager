@@ -22,7 +22,7 @@ export function EditTestPage() {
       try {
         setTest(await testsApi.getById(testId));
       } catch (requestError) {
-        setError(requestError instanceof Error ? requestError.message : "Failed to load test.");
+        setError(requestError instanceof Error ? requestError.message : "Не удалось загрузить тест.");
       } finally {
         setIsLoading(false);
       }
@@ -39,38 +39,38 @@ export function EditTestPage() {
       const updatedTest = await testsApi.update(testId, request);
       navigate(`/tests/${updatedTest.id}`);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Failed to update test.");
+      setError(requestError instanceof Error ? requestError.message : "Не удалось обновить тест.");
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <StateBlock message="Loading the current test content." title="Opening editor" />;
+    return <StateBlock message="Загружаем текущее содержимое теста." title="Открываем редактор" />;
   }
 
   if (!test) {
-    return <StateBlock message={error ?? "Test was not found."} title="Could not edit test" tone="error" />;
+    return <StateBlock message={error ?? "Тест не найден."} title="Не удалось открыть редактор" tone="error" />;
   }
 
   return (
     <section className="page">
       <header className="page-header hero-header">
         <div>
-          <span className="eyebrow">Edit assessment</span>
-          <h1>Edit test</h1>
-          <p>Refine the title, questions, and answer options.</p>
+          <span className="eyebrow">Редактирование</span>
+          <h1>Изменить тест</h1>
+          <p>Уточните название, вопросы и варианты ответов.</p>
         </div>
       </header>
 
-      {error ? <StateBlock message={error} title="Could not save changes" tone="error" /> : null}
+      {error ? <StateBlock message={error} title="Не удалось сохранить изменения" tone="error" /> : null}
 
       <TestForm
         initialValue={test}
         isSaving={isSaving}
         onCancel={() => navigate(`/tests/${test.id}`)}
         onSubmit={updateTest}
-        submitLabel="Save changes"
+        submitLabel="Сохранить изменения"
       />
     </section>
   );

@@ -16,6 +16,7 @@ public class TestService(ITestRepository testRepository) : ITestService
             {
                 Id = test.Id,
                 Title = test.Title,
+                Description = test.Description,
                 QuestionsCount = test.Questions.Count
             })
             .ToList();
@@ -28,6 +29,13 @@ public class TestService(ITestRepository testRepository) : ITestService
         return test is null ? null : MapToDetailsDto(test);
     }
 
+    public async Task<TakeTestDto?> GetForTakingAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var test = await testRepository.GetByIdAsync(id, cancellationToken);
+
+        return test is null ? null : MapToTakeDto(test);
+    }
+
     public async Task<TestDetailsDto> CreateAsync(CreateTestRequest request, CancellationToken cancellationToken = default)
     {
         Validate(request.Title, request.Questions);
@@ -35,6 +43,7 @@ public class TestService(ITestRepository testRepository) : ITestService
         var test = new Test
         {
             Title = request.Title.Trim(),
+            Description = NormalizeDescription(request.Description),
             Questions = MapQuestions(request.Questions)
         };
 
@@ -55,6 +64,7 @@ public class TestService(ITestRepository testRepository) : ITestService
         }
 
         test.Title = request.Title.Trim();
+        test.Description = NormalizeDescription(request.Description);
         test.Questions.Clear();
 
         foreach (var question in MapQuestions(request.Questions))
@@ -299,6 +309,7 @@ public class TestService(ITestRepository testRepository) : ITestService
         {
             Id = test.Id,
             Title = test.Title,
+            Description = test.Description,
             Questions = test.Questions
                 .Select(question => new QuestionDto
                 {
@@ -316,5 +327,37 @@ public class TestService(ITestRepository testRepository) : ITestService
                 })
                 .ToList()
         };
+    }
+
+    private static TakeTestDto MapToTakeDto(Test test)
+    {
+        return new TakeTestDto
+        {
+            Id = test.Id,
+            Title = test.Title,
+            Description = test.Description,
+            Questions = test.Questions
+                .Select(question => new TakeQuestionDto
+                {
+                    Id = question.Id,
+                    Text = question.Text,
+                    Type = question.Type,
+                    AnswerOptions = question.AnswerOptions
+                        .Select(answerOption => new TakeAnswerOptionDto
+                        {
+                            Id = answerOption.Id,
+                            Text = answerOption.Text
+                        })
+                        .ToList()
+                })
+                .ToList()
+        };
+    }
+
+    private static string? NormalizeDescription(string? description)
+    {
+        var trimmedDescription = description?.Trim();
+
+        return string.IsNullOrWhiteSpace(trimmedDescription) ? null : trimmedDescription;
     }
 }

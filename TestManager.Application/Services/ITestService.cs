@@ -8,6 +8,8 @@ public interface ITestService
 
     Task<TestDetailsDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
+    Task<TakeTestDto?> GetForTakingAsync(int id, CancellationToken cancellationToken = default);
+
     Task<TestDetailsDto> CreateAsync(CreateTestRequest request, CancellationToken cancellationToken = default);
 
     Task<TestDetailsDto?> UpdateAsync(int id, UpdateTestRequest request, CancellationToken cancellationToken = default);

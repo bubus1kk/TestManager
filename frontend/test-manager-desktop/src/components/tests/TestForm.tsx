@@ -78,49 +78,49 @@ function toFormValue(initialValue?: TestDetailsDto): TestFormValue {
 }
 
 function getQuestionTypeLabel(type: QuestionType) {
-  return type === QuestionType.SingleChoice ? "Single choice" : "Multiple choice";
+  return type === QuestionType.SingleChoice ? "Один ответ" : "Несколько ответов";
 }
 
 function validateForm(value: TestFormValue): string[] {
   const errors: string[] = [];
 
   if (!value.title.trim()) {
-    errors.push("Title is required.");
+    errors.push("Название обязательно.");
   }
 
   if (value.title.trim().length > 200) {
-    errors.push("Title must be 200 characters or fewer.");
+    errors.push("Название должно быть не длиннее 200 символов.");
   }
 
   if (value.questions.length === 0) {
-    errors.push("Add at least one question.");
+    errors.push("Добавьте хотя бы один вопрос.");
   }
 
   value.questions.forEach((question, questionIndex) => {
     const questionNumber = questionIndex + 1;
 
     if (!question.text.trim()) {
-      errors.push(`Question ${questionNumber}: text is required.`);
+      errors.push(`Вопрос ${questionNumber}: текст обязателен.`);
     }
 
     if (question.answerOptions.length < 2) {
-      errors.push(`Question ${questionNumber}: add at least two answer options.`);
+      errors.push(`Вопрос ${questionNumber}: добавьте минимум два варианта ответа.`);
     }
 
     question.answerOptions.forEach((answerOption, answerIndex) => {
       if (!answerOption.text.trim()) {
-        errors.push(`Question ${questionNumber}, option ${answerIndex + 1}: text is required.`);
+        errors.push(`Вопрос ${questionNumber}, вариант ${answerIndex + 1}: текст обязателен.`);
       }
     });
 
     const correctAnswersCount = question.answerOptions.filter((answerOption) => answerOption.isCorrect).length;
 
     if (question.type === QuestionType.SingleChoice && correctAnswersCount !== 1) {
-      errors.push(`Question ${questionNumber}: choose exactly one correct answer.`);
+      errors.push(`Вопрос ${questionNumber}: выберите ровно один правильный ответ.`);
     }
 
     if (question.type === QuestionType.MultipleChoice && correctAnswersCount < 1) {
-      errors.push(`Question ${questionNumber}: choose at least one correct answer.`);
+      errors.push(`Вопрос ${questionNumber}: выберите хотя бы один правильный ответ.`);
     }
   });
 
@@ -297,7 +297,7 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
     <form className="test-form" onSubmit={handleSubmit}>
       {errors.length > 0 ? (
         <div className="form-errors" role="alert">
-          <strong>Check the form</strong>
+          <strong>Проверьте форму</strong>
           <ul>
             {errors.map((error) => (
               <li key={error}>{error}</li>
@@ -309,18 +309,18 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
       <Card className="form-card">
         <div className="form-grid">
           <Input
-            label="Title"
+            label="Название"
             maxLength={200}
             name="title"
             onChange={(event) => setFormValue((current) => ({ ...current, title: event.target.value }))}
-            placeholder="Final JavaScript fundamentals"
+            placeholder="Итоговый тест по основам JavaScript"
             value={formValue.title}
           />
           <Textarea
-            label="Description"
+            label="Описание"
             name="description"
             onChange={(event) => setFormValue((current) => ({ ...current, description: event.target.value }))}
-            placeholder="A concise note about the test scope, audience, or timing."
+            placeholder="Кратко опишите тему, аудиторию или условия прохождения."
             rows={4}
             value={formValue.description}
           />
@@ -332,28 +332,28 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
           <Card className="question-card" key={question.clientId}>
             <div className="question-card-header">
               <div>
-                <Badge tone="peach">Question {questionIndex + 1}</Badge>
-                <h2>{question.text.trim() || "Untitled question"}</h2>
+                <Badge tone="peach">Вопрос {questionIndex + 1}</Badge>
+                <h2>{question.text.trim() || "Вопрос без названия"}</h2>
               </div>
               <Button
                 disabled={formValue.questions.length <= 1}
                 onClick={() => removeQuestion(question.clientId)}
                 variant="danger"
               >
-                Remove question
+                Удалить вопрос
               </Button>
             </div>
 
             <Textarea
-              label="Question text"
+              label="Текст вопроса"
               name={`question-${question.clientId}`}
               onChange={(event) => updateQuestion(question.clientId, { text: event.target.value })}
-              placeholder="What should the learner answer?"
+              placeholder="На что должен ответить пользователь?"
               rows={3}
               value={question.text}
             />
 
-            <div className="type-selector" aria-label="Question type">
+            <div className="type-selector" aria-label="Тип вопроса">
               {[QuestionType.SingleChoice, QuestionType.MultipleChoice].map((type) => (
                 <button
                   className={question.type === type ? "type-chip active" : "type-chip"}
@@ -378,17 +378,17 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
                       }
                       type={question.type === QuestionType.SingleChoice ? "radio" : "checkbox"}
                     />
-                    <span>Correct</span>
+                    <span>Правильный</span>
                   </label>
                   <Input
-                    label={`Option ${answerIndex + 1}`}
+                    label={`Вариант ${answerIndex + 1}`}
                     name={`answer-${answerOption.clientId}`}
                     onChange={(event) =>
                       updateAnswerOption(question.clientId, answerOption.clientId, {
                         text: event.target.value,
                       })
                     }
-                    placeholder="Answer option"
+                    placeholder="Вариант ответа"
                     value={answerOption.text}
                   />
                   <Button
@@ -396,14 +396,14 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
                     onClick={() => removeAnswerOption(question.clientId, answerOption.clientId)}
                     variant="ghost"
                   >
-                    Remove
+                    Удалить
                   </Button>
                 </div>
               ))}
             </div>
 
             <Button onClick={() => addAnswerOption(question.clientId)} variant="secondary">
-              Add answer option
+              Добавить вариант
             </Button>
           </Card>
         ))}
@@ -411,14 +411,14 @@ export function TestForm({ initialValue, isSaving = false, onCancel, onSubmit, s
 
       <div className="form-footer">
         <Button onClick={addQuestion} variant="secondary">
-          Add question
+          Добавить вопрос
         </Button>
         <div className="form-footer-actions">
           <Button onClick={onCancel} variant="ghost">
-            Cancel
+            Отмена
           </Button>
           <Button disabled={isSaving} type="submit" variant="primary">
-            {isSaving ? "Saving..." : submitLabel}
+            {isSaving ? "Сохранение..." : submitLabel}
           </Button>
         </div>
       </div>

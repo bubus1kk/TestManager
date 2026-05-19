@@ -21,6 +21,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .IsRequired()
                 .HasMaxLength(200);
 
+            entity.Property(test => test.Description);
+
             entity.HasMany(test => test.Questions)
                 .WithOne(question => question.Test)
                 .HasForeignKey(question => question.TestId)

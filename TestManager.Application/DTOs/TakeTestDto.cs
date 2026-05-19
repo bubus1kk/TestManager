@@ -1,6 +1,6 @@
 namespace TestManager.Application.DTOs;
 
-public class TestDetailsDto
+public class TakeTestDto
 {
     public int Id { get; set; }
 
@@ -8,5 +8,5 @@ public class TestDetailsDto
 
     public string? Description { get; set; }
 
-    public ICollection<QuestionDto> Questions { get; set; } = new List<QuestionDto>();
+    public ICollection<TakeQuestionDto> Questions { get; set; } = new List<TakeQuestionDto>();
 }
