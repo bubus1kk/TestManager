@@ -1,6 +1,7 @@
 import type {
   CreateTestRequest,
   SubmitTestAttemptRequest,
+  TakeTestDto,
   TestAttemptResultDto,
   TestDetailsDto,
   TestListItemDto,
@@ -23,7 +24,7 @@ async function request<TResponse>(
 
   if (!response.ok) {
     const errorBody = await readErrorBody(response);
-    throw new Error(errorBody || `Request failed with status ${response.status}.`);
+    throw new Error(errorBody || `Запрос завершился ошибкой ${response.status}.`);
   }
 
   if (response.status === 204) {
@@ -51,6 +52,10 @@ export const testsApi = {
 
   getById(id: number): Promise<TestDetailsDto> {
     return request<TestDetailsDto>(`/api/tests/${id}`);
+  },
+
+  getForTaking(id: number): Promise<TakeTestDto> {
+    return request<TakeTestDto>(`/api/tests/${id}/take`);
   },
 
   create(requestBody: CreateTestRequest): Promise<TestDetailsDto> {

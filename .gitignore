@@ -16,6 +16,7 @@ publish/
 # Node
 node_modules/
 npm-debug.log*
+vite.*.log
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
@@ -28,6 +29,11 @@ src-tauri/target/
 src-tauri/gen/
 src-tauri/.tauri/
 *.pdb
+
+# Runtime data
+*.db
+*.db-shm
+*.db-wal
 
 # IDEs
 .vs/

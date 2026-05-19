@@ -30,6 +30,25 @@ export interface TestDetailsDto {
   questions: QuestionDto[];
 }
 
+export interface TakeAnswerOptionDto {
+  id: number;
+  text: string;
+}
+
+export interface TakeQuestionDto {
+  id: number;
+  text: string;
+  type: QuestionType;
+  answerOptions: TakeAnswerOptionDto[];
+}
+
+export interface TakeTestDto {
+  description?: string;
+  id: number;
+  title: string;
+  questions: TakeQuestionDto[];
+}
+
 export interface CreateAnswerOptionRequest {
   text: string;
   isCorrect: boolean;

@@ -9,7 +9,7 @@ import { StateBlock } from "../components/ui/StateBlock";
 import { QuestionType, type TestDetailsDto } from "../types/tests";
 
 function getQuestionTypeLabel(type: QuestionType) {
-  return type === QuestionType.SingleChoice ? "Single choice" : "Multiple choice";
+  return type === QuestionType.SingleChoice ? "Один ответ" : "Несколько ответов";
 }
 
 export function TestDetailsPage() {
@@ -27,7 +27,7 @@ export function TestDetailsPage() {
       try {
         setTest(await testsApi.getById(testId));
       } catch (requestError) {
-        setError(requestError instanceof Error ? requestError.message : "Failed to load test.");
+        setError(requestError instanceof Error ? requestError.message : "Не удалось загрузить тест.");
       } finally {
         setIsLoading(false);
       }
@@ -37,41 +37,41 @@ export function TestDetailsPage() {
   }, [testId]);
 
   if (isLoading) {
-    return <StateBlock message="Preparing the full test structure." title="Loading test" />;
+    return <StateBlock message="Подготавливаем полную структуру теста." title="Загрузка теста" />;
   }
 
   if (error || !test) {
-    return <StateBlock message={error ?? "Test was not found."} title="Could not open test" tone="error" />;
+    return <StateBlock message={error ?? "Тест не найден."} title="Не удалось открыть тест" tone="error" />;
   }
 
   return (
     <section className="page">
       <header className="page-header hero-header">
         <div>
-          <span className="eyebrow">Test details</span>
+          <span className="eyebrow">Детали теста</span>
           <h1>{test.title}</h1>
-          <p>{test.description || "No description yet. The question structure is shown below."}</p>
+          <p>{test.description || "Описание пока не добавлено. Структура вопросов показана ниже."}</p>
         </div>
         <div className="actions">
           <Button to={`/tests/${test.id}/edit`} variant="secondary">
-            Edit
+            Изменить
           </Button>
           <Button to={`/tests/${test.id}/take`} variant="primary">
-            Take Test
+            Пройти тест
           </Button>
         </div>
       </header>
 
       <Section
-        description={`${test.questions.length} question${test.questions.length === 1 ? "" : "s"} configured`}
-        title="Question structure"
+        description={`Настроено вопросов: ${test.questions.length}`}
+        title="Структура вопросов"
       >
         <div className="details-list">
           {test.questions.map((question, questionIndex) => (
             <Card className="details-question-card" key={question.id}>
               <div className="details-question-header">
                 <div>
-                  <Badge tone="peach">Question {questionIndex + 1}</Badge>
+                  <Badge tone="peach">Вопрос {questionIndex + 1}</Badge>
                   <h2>{question.text}</h2>
                 </div>
                 <Badge tone={question.type === QuestionType.SingleChoice ? "sage" : "terra"}>
@@ -84,7 +84,7 @@ export function TestDetailsPage() {
                   <div className="details-option" key={answerOption.id}>
                     <span className="option-index">{answerIndex + 1}</span>
                     <span>{answerOption.text}</span>
-                    {answerOption.isCorrect ? <Badge tone="sage">Correct</Badge> : null}
+                    {answerOption.isCorrect ? <Badge tone="sage">Правильный</Badge> : null}
                   </div>
                 ))}
               </div>

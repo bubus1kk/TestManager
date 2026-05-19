@@ -18,7 +18,7 @@ export function CreateTestPage() {
       const createdTest = await testsApi.create(request);
       navigate(`/tests/${createdTest.id}`);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Failed to create test.");
+      setError(requestError instanceof Error ? requestError.message : "Не удалось создать тест.");
     } finally {
       setIsSaving(false);
     }
@@ -28,19 +28,18 @@ export function CreateTestPage() {
     <section className="page">
       <header className="page-header hero-header">
         <div>
-          <span className="eyebrow">New assessment</span>
-          <h1>Create test</h1>
-          <p>Build the test structure now; publishing controls can come later.</p>
+          <span className="eyebrow">Новая проверка</span>
+          <h1>Создать тест</h1>
         </div>
       </header>
 
-      {error ? <StateBlock message={error} title="Could not save test" tone="error" /> : null}
+      {error ? <StateBlock message={error} title="Не удалось сохранить тест" tone="error" /> : null}
 
       <TestForm
         isSaving={isSaving}
         onCancel={() => navigate("/")}
         onSubmit={createTest}
-        submitLabel="Create test"
+        submitLabel="Создать тест"
       />
     </section>
   );

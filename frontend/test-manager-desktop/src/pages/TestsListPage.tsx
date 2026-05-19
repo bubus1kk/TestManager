@@ -7,6 +7,20 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { StateBlock } from "../components/ui/StateBlock";
 import type { TestListItemDto } from "../types/tests";
 
+const DESCRIPTION_PREVIEW_LENGTH = 50;
+
+function getDescriptionPreview(description?: string) {
+  const trimmedDescription = description?.trim();
+
+  if (!trimmedDescription) {
+    return "Описание отсутствует";
+  }
+
+  return trimmedDescription.length > DESCRIPTION_PREVIEW_LENGTH
+    ? `${trimmedDescription.slice(0, DESCRIPTION_PREVIEW_LENGTH)}...`
+    : trimmedDescription;
+}
+
 export function TestsListPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +33,7 @@ export function TestsListPage() {
     try {
       setTests(await testsApi.getAll());
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Failed to load tests.");
+      setError(requestError instanceof Error ? requestError.message : "Не удалось загрузить тесты.");
     } finally {
       setIsLoading(false);
     }
@@ -30,7 +44,7 @@ export function TestsListPage() {
   }, []);
 
   const deleteTest = async (test: TestListItemDto) => {
-    const confirmed = window.confirm(`Delete "${test.title}"? This action cannot be undone.`);
+    const confirmed = window.confirm(`Удалить "${test.title}"? Это действие нельзя отменить.`);
 
     if (!confirmed) {
       return;
@@ -40,7 +54,7 @@ export function TestsListPage() {
       await testsApi.delete(test.id);
       setTests((current) => current.filter((item) => item.id !== test.id));
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Failed to delete test.");
+      setError(requestError instanceof Error ? requestError.message : "Не удалось удалить тест.");
     }
   };
 
@@ -48,32 +62,31 @@ export function TestsListPage() {
     <section className="page">
       <header className="page-header hero-header">
         <div>
-          <span className="eyebrow">Assessment workspace</span>
-          <h1>Tests</h1>
-          <p>Design, review, and launch structured knowledge checks from one calm workspace.</p>
+          <span className="eyebrow">Рабочая область</span>
+          <h1>Тесты</h1>
         </div>
         <Button to="/tests/create" variant="primary">
-          New test
+          Новый тест
         </Button>
       </header>
 
       {isLoading ? (
-        <StateBlock message="Fetching the latest test catalog." title="Loading tests" />
+        <StateBlock message="Получаем актуальный список тестов." title="Загрузка тестов" />
       ) : null}
 
       {!isLoading && error ? (
-        <StateBlock message={error} title="Could not load tests" tone="error" />
+        <StateBlock message={error} title="Не удалось загрузить тесты" tone="error" />
       ) : null}
 
       {!isLoading && !error && tests.length === 0 ? (
         <EmptyState
           action={
             <Button to="/tests/create" variant="primary">
-              Create first test
+              Создать первый тест
             </Button>
           }
-          description="Start with a title, then add questions and answer options when you are ready."
-          title="No tests yet"
+          description="Начните с названия, затем добавьте вопросы и варианты ответов."
+          title="Тестов пока нет"
         />
       ) : null}
 
@@ -82,22 +95,22 @@ export function TestsListPage() {
           {tests.map((test) => (
             <Card className="test-card" key={test.id}>
               <div className="test-card-top">
-                <Badge tone="terra">{test.questionsCount} questions</Badge>
+                <Badge tone="terra">Вопросов: {test.questionsCount}</Badge>
               </div>
               <h2>{test.title}</h2>
-              <p>{test.description || "No description yet. Add one when editing this test."}</p>
+              <p>{getDescriptionPreview(test.description)}</p>
               <div className="test-card-actions">
                 <Button to={`/tests/${test.id}`} variant="secondary">
-                  View
+                  Открыть
                 </Button>
                 <Button to={`/tests/${test.id}/edit`} variant="ghost">
-                  Edit
+                  Изменить
                 </Button>
                 <Button to={`/tests/${test.id}/take`} variant="primary">
-                  Take Test
+                  Пройти тест
                 </Button>
                 <Button onClick={() => void deleteTest(test)} variant="danger">
-                  Delete
+                  Удалить
                 </Button>
               </div>
             </Card>

@@ -25,6 +25,14 @@ public class TestsController(ITestService testService) : ControllerBase
         return test is null ? NotFound() : Ok(test);
     }
 
+    [HttpGet("{id:int}/take")]
+    public async Task<ActionResult<TakeTestDto>> GetForTaking(int id, CancellationToken cancellationToken)
+    {
+        var test = await testService.GetForTakingAsync(id, cancellationToken);
+
+        return test is null ? NotFound() : Ok(test);
+    }
+
     [HttpPost]
     public async Task<ActionResult<TestDetailsDto>> Create(
         CreateTestRequest request,
