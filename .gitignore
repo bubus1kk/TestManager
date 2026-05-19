@@ -1,0 +1,39 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+TestResults/
+coverage/
+
+# Build artifacts
+artifacts/
+publish/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+dist-ssr/
+*.local
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/.tauri/
+*.pdb
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
