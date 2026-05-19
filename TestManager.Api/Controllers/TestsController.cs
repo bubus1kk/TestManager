@@ -67,4 +67,22 @@ public class TestsController(ITestService testService) : ControllerBase
 
         return deleted ? NoContent() : NotFound();
     }
+
+    [HttpPost("{id:int}/submit")]
+    public async Task<ActionResult<TestAttemptResultDto>> Submit(
+        int id,
+        SubmitTestAttemptRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await testService.SubmitAsync(id, request, cancellationToken);
+
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (ValidationException exception)
+        {
+            return BadRequest(new { error = exception.Message });
+        }
+    }
 }

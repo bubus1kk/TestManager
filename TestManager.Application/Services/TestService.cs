@@ -81,6 +81,35 @@ public class TestService(ITestRepository testRepository) : ITestService
         return true;
     }
 
+    public async Task<TestAttemptResultDto?> SubmitAsync(
+        int id,
+        SubmitTestAttemptRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var test = await testRepository.GetByIdAsync(id, cancellationToken);
+        if (test is null)
+        {
+            return null;
+        }
+
+        if (request is null)
+        {
+            throw new ValidationException("Submit request is required.");
+        }
+
+        var submittedAnswers = BuildSubmittedAnswersLookup(test, request);
+        var score = test.Questions.Sum(question => CalculateQuestionScore(question, submittedAnswers));
+        var maxScore = test.Questions.Count;
+
+        return new TestAttemptResultDto
+        {
+            TestId = test.Id,
+            Score = score,
+            MaxScore = maxScore,
+            Percentage = maxScore == 0 ? 0 : score / maxScore * 100
+        };
+    }
+
     private static void Validate(string? title, ICollection<QuestionDto>? questions)
     {
         var trimmedTitle = title?.Trim();
@@ -150,6 +179,100 @@ public class TestService(ITestRepository testRepository) : ITestService
             default:
                 throw new ValidationException("Question type is invalid.");
         }
+    }
+
+    private static Dictionary<int, HashSet<int>> BuildSubmittedAnswersLookup(
+        Test test,
+        SubmitTestAttemptRequest request)
+    {
+        if (request.Answers is null)
+        {
+            throw new ValidationException("Answers are required.");
+        }
+
+        var questionIds = test.Questions.Select(question => question.Id).ToHashSet();
+        var answersByQuestionId = new Dictionary<int, HashSet<int>>();
+
+        foreach (var answer in request.Answers)
+        {
+            if (answer is null)
+            {
+                throw new ValidationException("Submitted answer is required.");
+            }
+
+            if (!questionIds.Contains(answer.QuestionId))
+            {
+                throw new ValidationException("Submitted question does not belong to the test.");
+            }
+
+            var question = test.Questions.First(question => question.Id == answer.QuestionId);
+            var answerOptionIds = question.AnswerOptions
+                .Select(answerOption => answerOption.Id)
+                .ToHashSet();
+            var selectedAnswerOptionIds = answer.SelectedAnswerOptionIds?.ToHashSet() ?? new HashSet<int>();
+
+            if (selectedAnswerOptionIds.Any(selectedId => !answerOptionIds.Contains(selectedId)))
+            {
+                throw new ValidationException("Selected answer option does not belong to the question.");
+            }
+
+            if (answersByQuestionId.ContainsKey(answer.QuestionId))
+            {
+                throw new ValidationException("Question answer was submitted more than once.");
+            }
+
+            answersByQuestionId[answer.QuestionId] = selectedAnswerOptionIds;
+        }
+
+        return answersByQuestionId;
+    }
+
+    private static double CalculateQuestionScore(
+        Question question,
+        IReadOnlyDictionary<int, HashSet<int>> submittedAnswers)
+    {
+        submittedAnswers.TryGetValue(question.Id, out var selectedAnswerOptionIds);
+        selectedAnswerOptionIds ??= new HashSet<int>();
+
+        var correctAnswerOptionIds = question.AnswerOptions
+            .Where(answerOption => answerOption.IsCorrect)
+            .Select(answerOption => answerOption.Id)
+            .ToHashSet();
+
+        return question.Type switch
+        {
+            QuestionType.SingleChoice => CalculateSingleChoiceScore(selectedAnswerOptionIds, correctAnswerOptionIds),
+            QuestionType.MultipleChoice => CalculateMultipleChoiceScore(selectedAnswerOptionIds, correctAnswerOptionIds),
+            _ => 0
+        };
+    }
+
+    private static double CalculateSingleChoiceScore(
+        IReadOnlySet<int> selectedAnswerOptionIds,
+        IReadOnlySet<int> correctAnswerOptionIds)
+    {
+        return selectedAnswerOptionIds.Count == 1
+            && correctAnswerOptionIds.Count == 1
+            && correctAnswerOptionIds.Contains(selectedAnswerOptionIds.Single())
+            ? 1
+            : 0;
+    }
+
+    private static double CalculateMultipleChoiceScore(
+        IReadOnlySet<int> selectedAnswerOptionIds,
+        IReadOnlySet<int> correctAnswerOptionIds)
+    {
+        if (correctAnswerOptionIds.Count == 0)
+        {
+            return 0;
+        }
+
+        var correctWeight = 1d / correctAnswerOptionIds.Count;
+        var correctSelected = selectedAnswerOptionIds.Count(correctAnswerOptionIds.Contains);
+        var incorrectSelected = selectedAnswerOptionIds.Count(selectedId => !correctAnswerOptionIds.Contains(selectedId));
+        var questionScore = correctSelected * correctWeight - incorrectSelected * correctWeight;
+
+        return Math.Max(0, questionScore);
     }
 
     private static List<Question> MapQuestions(IEnumerable<QuestionDto> questionDtos)
