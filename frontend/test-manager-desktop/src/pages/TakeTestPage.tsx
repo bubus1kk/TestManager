@@ -10,9 +10,11 @@ import {
   type SubmitTestAttemptRequest,
   type TakeTestDto,
   type TestAttemptResultDto,
+  type TestDetailsDto,
 } from "../types/tests";
 
 type SelectedAnswers = Record<number, number[]>;
+type CorrectAnswers = Record<number, number[]>;
 
 function getQuestionTypeLabel(type: QuestionType) {
   return type === QuestionType.SingleChoice ? "Один ответ" : "Несколько ответов";
@@ -39,6 +41,15 @@ function buildSubmitRequest(test: TakeTestDto, selectedAnswers: SelectedAnswers)
   };
 }
 
+function buildCorrectAnswers(test: TestDetailsDto): CorrectAnswers {
+  return Object.fromEntries(
+    test.questions.map((question) => [
+      question.id,
+      question.answerOptions.filter((answerOption) => answerOption.isCorrect).map((answerOption) => answerOption.id),
+    ]),
+  );
+}
+
 export function TakeTestPage() {
   const { id } = useParams();
   const testId = Number(id);
@@ -46,6 +57,7 @@ export function TakeTestPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<TestAttemptResultDto | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState<CorrectAnswers>({});
   const [selectedAnswers, setSelectedAnswers] = useState<SelectedAnswers>({});
   const [test, setTest] = useState<TakeTestDto | null>(null);
   const isAttemptLocked = result !== null;
@@ -58,6 +70,8 @@ export function TakeTestPage() {
       try {
         const loadedTest = await testsApi.getForTaking(testId);
         setTest(loadedTest);
+        setResult(null);
+        setCorrectAnswers({});
         setSelectedAnswers(buildInitialAnswers(loadedTest));
       } catch (requestError) {
         setError(requestError instanceof Error ? requestError.message : "Не удалось загрузить тест.");
@@ -120,7 +134,11 @@ export function TakeTestPage() {
     setIsSubmitting(true);
 
     try {
-      setResult(await testsApi.submit(test.id, buildSubmitRequest(test, selectedAnswers)));
+      const attemptResult = await testsApi.submit(test.id, buildSubmitRequest(test, selectedAnswers));
+      setResult(attemptResult);
+
+      const testDetails = await testsApi.getById(test.id);
+      setCorrectAnswers(buildCorrectAnswers(testDetails));
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Не удалось отправить ответы.");
     } finally {
@@ -185,9 +203,13 @@ export function TakeTestPage() {
                 {question.answerOptions.map((answerOption) => {
                   const selectedQuestionAnswers = selectedAnswers[question.id] ?? [];
                   const isChecked = selectedQuestionAnswers.includes(answerOption.id);
+                  const isCorrectAfterSubmit = isAttemptLocked && correctAnswers[question.id]?.includes(answerOption.id);
 
                   return (
-                    <label className="attempt-option" key={answerOption.id}>
+                    <label
+                      className={isCorrectAfterSubmit ? "attempt-option attempt-option-correct" : "attempt-option"}
+                      key={answerOption.id}
+                    >
                       <input
                         checked={isChecked}
                         disabled={isAttemptLocked}

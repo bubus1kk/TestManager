@@ -603,6 +603,30 @@ button:disabled {
   transform: none;
 }
 
+.attempt-locked .attempt-option-correct,
+.attempt-locked .attempt-option-correct:hover {
+  border-color: rgba(91, 132, 61, 0.34);
+  background: #f1f7e8;
+  box-shadow: inset 0 0 0 1px rgba(91, 132, 61, 0.08);
+}
+
+.attempt-locked .attempt-option-correct .attempt-control {
+  border-color: #6f8f44;
+  background: #edf6df;
+  box-shadow: 0 0 0 4px rgba(111, 143, 68, 0.14);
+}
+
+.attempt-locked .attempt-option-correct .attempt-control::after {
+  background: #5f7f36;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.attempt-locked .attempt-option-correct > span:last-child {
+  color: #38511f;
+  font-weight: 800;
+}
+
 .attempt-option input {
   position: absolute;
   opacity: 0;
