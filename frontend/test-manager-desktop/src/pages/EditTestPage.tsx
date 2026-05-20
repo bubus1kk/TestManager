@@ -59,7 +59,6 @@ export function EditTestPage() {
         <div>
           <span className="eyebrow">Редактирование</span>
           <h1>Изменить тест</h1>
-          <p>Уточните название, вопросы и варианты ответов.</p>
         </div>
       </header>
 

@@ -160,7 +160,6 @@ export function TakeTestPage() {
         <div>
           <span className="eyebrow">Режим прохождения</span>
           <h1>{test.title}</h1>
-          <p>{test.description || "Выберите ответы на вопросы и отправьте попытку для подсчёта результата."}</p>
         </div>
         <Button to={`/tests/${test.id}`} variant="secondary">
           Назад к деталям

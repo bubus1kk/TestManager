@@ -23,6 +23,8 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -33,6 +35,9 @@ if (app.Environment.IsDevelopment())
 
     await dbContext.Database.MigrateAsync();
     await DemoDataSeeder.SeedAsync(dbContext);
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseCors(desktopClientCorsPolicy);
